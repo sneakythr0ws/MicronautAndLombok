@@ -5,6 +5,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.runtime.Micronaut;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import reactor.core.publisher.Mono;
 
 import javax.inject.Singleton;
@@ -18,22 +19,11 @@ public class Application {
         Micronaut.run(Application.class);
     }
 
+    @Value
     @Introspected
     static class Conference {
 
         private String name;
-
-        public Conference(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
     }
 
     @Singleton
