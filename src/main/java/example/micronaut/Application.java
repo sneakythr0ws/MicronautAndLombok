@@ -1,11 +1,16 @@
 package example.micronaut;
 
+import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.runtime.Micronaut;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
 
 import javax.inject.Singleton;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 public class Application {
 
@@ -13,22 +18,53 @@ public class Application {
         Micronaut.run(Application.class);
     }
 
-    @Controller
-    @RequiredArgsConstructor
-    static class ConferenceController {
+    @Introspected
+    static class Conference {
 
-        private final ConferenceService conferenceService;
+        private String name;
 
-        @Get("/hw")
-        public String hw() {
-            return conferenceService.hw();
+        public Conference(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
         }
     }
 
     @Singleton
     static class ConferenceService {
-        String hw() {
-            return "hw";
+
+        private static final List<Conference> CONFERENCES = Arrays.asList(
+                new Conference("Greach"),
+                new Conference("GR8Conf EU"),
+                new Conference("Micronaut Summit"),
+                new Conference("Devoxx Belgium"),
+                new Conference("Oracle Code One"),
+                new Conference("CommitConf"),
+                new Conference("Codemotion Madrid")
+        );
+
+        public Mono<Conference> randomConf() {
+            return Mono.just(CONFERENCES.get(new Random().nextInt(CONFERENCES.size())));
+        }
+    }
+
+    @RequiredArgsConstructor
+    @Controller("/conferences")
+    static class ConferenceController {
+
+        private final ConferenceService conferenceService;
+
+        @Get("/random")
+        public Mono<Conference> randomConf() {
+            return conferenceService.randomConf();
         }
     }
 }
+
+
